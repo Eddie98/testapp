@@ -67,8 +67,8 @@ class _FavoritePhotoPageState extends State<FavoritePhotoPage> {
         ),
       ),
       body: Consumer<AppModel>(
-        builder: (context, app, child) {
-          return _GridWidget(dataList: app.favoritesList);
+        builder: (context, model, child) {
+          return _GridWidget(dataList: model.favoritesList);
         },
       ),
     );
@@ -154,10 +154,10 @@ class _GridWidget extends StatelessWidget {
                 right: 0,
                 top: 0,
                 child: Consumer<AppModel>(
-                  builder: (context, app, child) {
+                  builder: (context, model, child) {
                     return IconButton(
                       onPressed: () {
-                        app.removeFavorite(photo);
+                        model.removeFavorite(photo);
                       },
                       icon: const Icon(
                         Icons.favorite,

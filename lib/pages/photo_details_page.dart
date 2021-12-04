@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:testapp/models/models.dart';
+import 'package:testapp/utils/utils.dart';
 
 class PhotoDetailsPage extends StatefulWidget {
   final Photo photo;
@@ -49,15 +50,23 @@ class _PhotoDetailsPageState extends State<PhotoDetailsPage> {
             ),
             const SizedBox(height: 15.0),
             Consumer<AppModel>(
-              builder: (context, app, child) {
+              builder: (context, model, child) {
+                var element =
+                    Helpers.findById(model.favoritesList, widget.photo.id);
+                var contains =
+                    model.favoritesList.isNotEmpty && element != null;
                 return ElevatedButton.icon(
                   onPressed: () {
-                    app.addFavorite(widget.photo);
+                    if (contains) {
+                      model.removeFavorite(widget.photo);
+                    } else {
+                      model.addFavorite(widget.photo);
+                    }
                   },
                   icon: const Icon(Icons.thumb_up),
-                  label: const Text(
-                    "Like",
-                    style: TextStyle(
+                  label: Text(
+                    contains ? "Unlike" : "Like",
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20.0,
                     ),
@@ -66,6 +75,7 @@ class _PhotoDetailsPageState extends State<PhotoDetailsPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32.0),
                     ),
+                    primary: contains ? Colors.red : Colors.blue,
                   ),
                 );
               },

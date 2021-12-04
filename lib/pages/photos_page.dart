@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:testapp/models/models.dart';
 import 'package:testapp/pages/pages.dart';
+import 'package:testapp/utils/utils.dart';
 
 class PhotosPage extends StatefulWidget {
   const PhotosPage({Key? key}) : super(key: key);
@@ -16,19 +17,37 @@ class PhotosPage extends StatefulWidget {
 }
 
 class _PhotosPageState extends State<PhotosPage> {
-  List<Photo> futureData = [];
+  String url = 'https://jsonplaceholder.typicode.com/photos';
+  List<Photo> fetchedData = [];
+  List<Photo> filteredData = [];
   final int increment = 16;
-  bool isLoadingVertical = false;
+  bool isLoading = false;
+  String dropdownValue = 'Все';
 
   @override
   void initState() {
     super.initState();
-    _onEndOfPage();
+    _onStart();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+
+    var albumIds = fetchedData.map((e) => e.albumId).toList();
+    var uniqs = albumIds.toSet().map((e) => e.toString()).toList();
+    uniqs.removeWhere((e) => e == 'Все');
+    uniqs.insert(0, 'Все');
+
+    if (!uniqs.contains(dropdownValue)) {
+      dropdownValue = 'Все';
+    }
+
+    if (dropdownValue != 'Все') {
+      filteredData = fetchedData
+          .where((e) => e.albumId.toString() == dropdownValue)
+          .toList();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -78,16 +97,51 @@ class _PhotosPageState extends State<PhotosPage> {
         ),
       ),
       body: LazyLoadScrollView(
-        isLoading: isLoadingVertical,
+        isLoading: isLoading,
         onEndOfPage: () => _onEndOfPage(),
-        scrollOffset: 200,
         child: Scrollbar(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
             child: ListView(
               children: [
-                _GridWidget(dataList: futureData),
-                if (isLoadingVertical)
+                Card(
+                  elevation: 1,
+                  margin: const EdgeInsets.only(bottom: 3),
+                  child: ListTile(
+                    title: const Text('Выберите альбом:'),
+                    contentPadding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    trailing: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        isExpanded: false,
+                        value: dropdownValue,
+                        items: uniqs.map<DropdownMenuItem<String>>(
+                          (String item) {
+                            return DropdownMenuItem<String>(
+                              child: SizedBox(
+                                child: Text(
+                                    item == 'Все' ? item : 'Альбом №$item'),
+                              ),
+                              value: item,
+                            );
+                          },
+                        ).toList(),
+                        onChanged: (String? value) {
+                          setState(() {
+                            dropdownValue = value!;
+                          });
+                        },
+                        style: const TextStyle(
+                          color: Colors.black,
+                          decorationColor: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                _GridWidget(
+                  dataList: dropdownValue != 'Все' ? filteredData : fetchedData,
+                ),
+                if (isLoading)
                   const Center(
                     child: CircularProgressIndicator(),
                   ),
@@ -99,49 +153,84 @@ class _PhotosPageState extends State<PhotosPage> {
     );
   }
 
-  Future<void> _onStart() async {}
+  Future<void> _onStart() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String photosCached = _prefs.getString('photosCached') ?? '';
 
-  Future<void> _onRefresh() async {
-    final response = await http.get(
-      Uri.parse(
-          'https://jsonplaceholder.typicode.com/photos?_limit=$increment'),
-    );
+    if (photosCached.isNotEmpty) {
+      List responseJson = json.decode(photosCached);
+      fetchedData.addAll(responseJson.map((m) => Photo.fromJson(m)).toList());
+      if (mounted) setState(() {});
+      return;
+    }
+
+    final response = await http.get(Uri.parse('$url?_limit=$increment'));
 
     // await Future.delayed(const Duration(seconds: 2));
 
     if (response.statusCode == 200) {
       List responseJson = json.decode(response.body);
-      setState(() {
-        futureData = responseJson.map((m) => Photo.fromJson(m)).toList();
-      });
+      _prefs.setString('photosCached', response.body);
+      fetchedData.addAll(responseJson.map((m) => Photo.fromJson(m)).toList());
+      if (mounted) setState(() {});
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _prefs.remove('photosCached');
+
+    final response = await http.get(Uri.parse('$url?_limit=$increment'));
+
+    // await Future.delayed(const Duration(seconds: 2));
+
+    if (response.statusCode == 200) {
+      List responseJson = json.decode(response.body);
+      _prefs.setString('photosCached', response.body);
+      if (mounted) {
+        setState(() {
+          fetchedData = responseJson.map((m) => Photo.fromJson(m)).toList();
+        });
+      }
     } else {
       throw Exception('Failed to load data');
     }
   }
 
   Future<void> _onEndOfPage() async {
-    setState(() {
-      isLoadingVertical = true;
-    });
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String photosCached = _prefs.getString('photosCached') ?? '';
 
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    int page = (fetchedData.length ~/ 16) + 1;
     final response = await http.get(
-      Uri.parse(
-          'https://jsonplaceholder.typicode.com/photos?_limit=$increment'),
+      Uri.parse('$url?_page=$page&_limit=$increment'),
     );
 
     // await Future.delayed(const Duration(seconds: 2));
 
     if (response.statusCode == 200) {
       List responseJson = json.decode(response.body);
-
-      futureData.addAll(responseJson.map((m) => Photo.fromJson(m)).toList());
+      List decodeCached = json.decode(photosCached);
+      decodeCached.addAll(responseJson);
+      _prefs.setString('photosCached', json.encode(decodeCached));
+      fetchedData.addAll(responseJson.map((m) => Photo.fromJson(m)).toList());
     } else {
       throw Exception('Failed to load data');
     }
 
-    setState(() {
-      isLoadingVertical = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }
 
@@ -224,13 +313,19 @@ class _GridWidget extends StatelessWidget {
                 right: 0,
                 top: 0,
                 child: Consumer<AppModel>(
-                  builder: (context, app, child) {
+                  builder: (context, model, child) {
                     return IconButton(
                       onPressed: () {
-                        app.addFavorite(photo);
+                        var element =
+                            Helpers.findById(model.favoritesList, photo.id);
+                        if (model.favoritesList.isNotEmpty && element != null) {
+                          model.removeFavorite(photo);
+                        } else {
+                          model.addFavorite(photo);
+                        }
                       },
                       icon: Icon(
-                        _likeIconRender(photo, app.favoritesList),
+                        _likeIconRender(photo, model.favoritesList),
                         color: Colors.red,
                       ),
                     );
@@ -245,7 +340,8 @@ class _GridWidget extends StatelessWidget {
   }
 
   IconData _likeIconRender(Photo item, List<Photo> list) {
-    if (list.contains(item)) {
+    var element = Helpers.findById(list, item.id);
+    if (list.isNotEmpty && element != null) {
       return Icons.favorite;
     }
     return Icons.favorite_border;
