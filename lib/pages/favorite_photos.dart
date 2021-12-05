@@ -29,10 +29,10 @@ class _FavoritePhotoPageState extends State<FavoritePhotoPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
-                child: Text(''),
+              DrawerHeader(
+                child: const Text(''),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               ListTile(
@@ -60,6 +60,15 @@ class _FavoritePhotoPageState extends State<FavoritePhotoPage> {
                 onTap: () {
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/favorite-photos", (route) => false);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.post_add_sharp),
+                title: const Text('Посты'),
+                minLeadingWidth: 20.0,
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/posts", (route) => false);
                 },
               ),
             ],

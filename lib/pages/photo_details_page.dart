@@ -75,7 +75,8 @@ class _PhotoDetailsPageState extends State<PhotoDetailsPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32.0),
                     ),
-                    primary: contains ? Colors.red : Colors.blue,
+                    primary:
+                        contains ? Colors.red : Theme.of(context).primaryColor,
                   ),
                 );
               },

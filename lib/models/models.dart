@@ -1,3 +1,5 @@
 export 'photo_model.dart';
 export 'app_model.dart';
-export 'photo_hive_model/photo_hive_model.dart';
+export 'post_model.dart';
+export 'user_model.dart';
+export 'comment_model.dart';

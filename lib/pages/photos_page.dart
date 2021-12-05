@@ -59,10 +59,10 @@ class _PhotosPageState extends State<PhotosPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
-                child: Text(''),
+              DrawerHeader(
+                child: const Text(''),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
               ListTile(
@@ -90,6 +90,15 @@ class _PhotosPageState extends State<PhotosPage> {
                 onTap: () {
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/favorite-photos", (route) => false);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.post_add_sharp),
+                title: const Text('Посты'),
+                minLeadingWidth: 20.0,
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/posts", (route) => false);
                 },
               ),
             ],
@@ -291,9 +300,9 @@ class _GridWidget extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(8.0),
                       bottomRight: Radius.circular(8.0),
                     ),

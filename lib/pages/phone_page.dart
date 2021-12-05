@@ -28,8 +28,9 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Verify OTP"),
-          systemOverlayStyle:
-              const SystemUiOverlayStyle(statusBarColor: Colors.blue),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Theme.of(context).primaryColor,
+          ),
         ),
         backgroundColor: const Color(0xFFFFFFFF),
         body: Center(

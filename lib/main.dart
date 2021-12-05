@@ -23,14 +23,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/',
+      initialRoute: '/posts',
       routes: {
         '/': (context) => const PhotosPage(),
         '/photos': (context) => const PhotosPage(),
         '/favorite-photos': (context) => const FavoritePhotoPage(),
+        '/posts': (context) => const PostsPage(),
       },
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        primaryColor: Colors.blue[600],
       ),
     );
   }
