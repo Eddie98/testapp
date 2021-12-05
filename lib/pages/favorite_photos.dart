@@ -36,15 +36,6 @@ class _FavoritePhotoPageState extends State<FavoritePhotoPage> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.home),
-                title: const Text('Домой'),
-                minLeadingWidth: 20.0,
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, "/", (route) => false);
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.image),
                 title: const Text('Лента фотографий'),
                 minLeadingWidth: 20.0,
@@ -69,6 +60,15 @@ class _FavoritePhotoPageState extends State<FavoritePhotoPage> {
                 onTap: () {
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/posts", (route) => false);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.phone),
+                title: const Text('Авторизация / Регистрация'),
+                minLeadingWidth: 20.0,
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/", (route) => false);
                 },
               ),
             ],
