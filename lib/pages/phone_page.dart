@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_phone_auth_handler/firebase_phone_auth_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -95,16 +94,18 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
               SizedBox(
                 width: size.width * 0.8,
                 child: TextFormField(
-                    keyboardType: TextInputType.phone,
-                    controller: phoneNumber,
-                    decoration: InputDecoration(
-                      labelText: "Enter Phone",
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15.0,
-                        horizontal: 10.0,
-                      ),
-                      border: border,
-                    )),
+                  keyboardType: TextInputType.phone,
+                  controller: phoneNumber,
+                  decoration: InputDecoration(
+                    labelText: "Enter Phone",
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 10.0,
+                    ),
+                    border: border,
+                  ),
+                  validator: validateMobile,
+                ),
               ),
               Padding(padding: EdgeInsets.only(bottom: size.height * 0.05)),
               !isLoading
@@ -146,38 +147,49 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
       ),
     );
   }
+
+  String? validateMobile(String? value) {
+    String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
+    RegExp regExp = RegExp(pattern);
+
+    if (value!.isEmpty) {
+      return 'Please enter mobile number';
+    } else if (!regExp.hasMatch(value)) {
+      return 'Please enter valid mobile number';
+    }
+
+    return null;
+  }
 }
 
-// ignore: must_be_immutable
-class _SendSMSWidget extends StatelessWidget {
+class _SendSMSWidget extends StatefulWidget {
   final String phoneNumber;
 
-  _SendSMSWidget({Key? key, required this.phoneNumber}) : super(key: key);
+  const _SendSMSWidget({Key? key, required this.phoneNumber}) : super(key: key);
 
+  @override
+  State<_SendSMSWidget> createState() => _SendSMSWidgetState();
+}
+
+class _SendSMSWidgetState extends State<_SendSMSWidget> {
   String? _enteredOTP;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: FirebasePhoneAuthHandler(
-        phoneNumber: phoneNumber,
+        phoneNumber: widget.phoneNumber,
         timeOutDuration: const Duration(seconds: 60),
         onLoginSuccess: (userCredential, autoVerified) async {
-          print(autoVerified
-              ? "OTP was fetched automatically"
-              : "OTP was verified manually");
-
-          print("Login Success UID: ${userCredential.user?.uid}");
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/photos", (route) => false);
         },
         onLoginFailed: (authException) {
           print("An error occurred: ${authException.message}");
-
-          // handle error further if needed
         },
         builder: (context, controller) {
           return Scaffold(
             appBar: AppBar(
-              title: const Text("Авторизация"),
               backgroundColor: Colors.black,
               actions: controller.codeSent
                   ? [
@@ -185,7 +197,7 @@ class _SendSMSWidget extends StatelessWidget {
                         child: Text(
                           controller.timerIsActive
                               ? "${controller.timerCount.inSeconds}s"
-                              : "RESEND",
+                              : "Отправить снова",
                           style:
                               const TextStyle(color: Colors.blue, fontSize: 18),
                         ),
@@ -204,7 +216,7 @@ class _SendSMSWidget extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     children: [
                       Text(
-                        "We've sent an SMS with a verification code to $phoneNumber",
+                        "Мы отправили СМС с кодом на номер: ${widget.phoneNumber}",
                         style: const TextStyle(
                           fontSize: 25,
                         ),
@@ -233,7 +245,7 @@ class _SendSMSWidget extends StatelessWidget {
                         ),
                       ),
                       const Text(
-                        "Enter Code Manually",
+                        "Ввести код вручную",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -250,7 +262,7 @@ class _SendSMSWidget extends StatelessWidget {
                             // Incorrect OTP
                             if (!res) {
                               print(
-                                "Please enter the correct OTP sent to $phoneNumber",
+                                "Please enter the correct OTP sent to ${widget.phoneNumber}",
                               );
                             }
                           }
@@ -266,7 +278,7 @@ class _SendSMSWidget extends StatelessWidget {
                       SizedBox(height: 50),
                       Center(
                         child: Text(
-                          "Sending OTP",
+                          "Отправляем код",
                           style: TextStyle(fontSize: 25),
                         ),
                       ),
@@ -284,11 +296,8 @@ class _SendSMSWidget extends StatelessWidget {
                             await controller.verifyOTP(otp: _enteredOTP!);
                         if (!res) {
                           print(
-                            "Please enter the correct OTP sent to $phoneNumber",
+                            "Please enter the correct OTP sent to ${widget.phoneNumber}",
                           );
-                        } else {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, "/photos", (route) => false);
                         }
                       }
                     },
