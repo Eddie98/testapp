@@ -81,7 +81,7 @@ class _PostsPageState extends State<PostsPage> {
                 minLeadingWidth: 20.0,
                 onTap: () {
                   Navigator.pushNamedAndRemoveUntil(
-                      context, "/favorite-posts", (route) => false);
+                      context, "/favorite-photos", (route) => false);
                 },
               ),
               ListTile(
