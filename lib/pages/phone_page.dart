@@ -20,8 +20,6 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
     ),
   );
 
-  bool isLoading = false;
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -108,39 +106,33 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
                 ),
               ),
               Padding(padding: EdgeInsets.only(bottom: size.height * 0.05)),
-              !isLoading
-                  ? SizedBox(
-                      width: size.width * 0.8,
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              isLoading = true;
-                            });
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => _SendSMSWidget(
-                                  phoneNumber: phoneNumber.text,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        child: const Text("Отправить СМС"),
-                        style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                                const Color(0xFFFFFFFF)),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color(0xFF000000),
-                            ),
-                            side: MaterialStateProperty.all<BorderSide>(
-                              BorderSide.none,
-                            )),
+              SizedBox(
+                width: size.width * 0.8,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => _SendSMSWidget(
+                            phoneNumber: phoneNumber.text,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Отправить СМС"),
+                  style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all<Color>(
+                          const Color(0xFFFFFFFF)),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF000000),
                       ),
-                    )
-                  : const CircularProgressIndicator(),
+                      side: MaterialStateProperty.all<BorderSide>(
+                        BorderSide.none,
+                      )),
+                ),
+              ),
             ],
           ),
         ),
@@ -231,7 +223,7 @@ class _SendSMSWidgetState extends State<_SendSMSWidget> {
                             CircularProgressIndicator(),
                             SizedBox(height: 50),
                             Text(
-                              "Listening for OTP",
+                              "Ждём код",
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 25,

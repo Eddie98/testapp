@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:testapp/models/models.dart';
 import 'package:http/http.dart' as http;
+import 'package:testapp/pages/pages.dart';
 
 class PostDetailsPage extends StatefulWidget {
   final Post post;
@@ -81,14 +82,14 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
                               ),
                               title: Text(author!.name),
                               onTap: () {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => PostDetailsPage(
-                                //       post: post,
-                                //     ),
-                                //   ),
-                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PostAuthorPage(
+                                      author: author,
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                           ],
