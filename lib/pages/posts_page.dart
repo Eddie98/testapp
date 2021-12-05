@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +34,25 @@ class _PostsPageState extends State<PostsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Посты"),
+        actions: [
+          Padding(
+            padding: EdgeInsets.zero,
+            child: IconButton(
+              icon: const Icon(
+                Icons.add,
+                size: 30.0,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => _AddPostWidget(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       drawer: SizedBox(
         width: size.width * 0.7,
@@ -251,5 +271,159 @@ class _GridWidget extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _AddPostWidget extends StatefulWidget {
+  @override
+  __AddPostWidgetState createState() => __AddPostWidgetState();
+}
+
+class __AddPostWidgetState extends State<_AddPostWidget> {
+  String url = 'https://jsonplaceholder.typicode.com/posts';
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  bool isLoading = false;
+
+  final TextEditingController controllerUserId = TextEditingController();
+  final TextEditingController controllerTitle = TextEditingController();
+  final TextEditingController controllerBody = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Добавить пост"),
+      ),
+      body: Form(
+        key: formkey,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            constraints: const BoxConstraints(
+              minHeight: 450.0,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: controllerUserId,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'User ID',
+                    hintText: 'Enter post author ID',
+                  ),
+                  validator: validator,
+                ),
+                const SizedBox(height: 15.0),
+                TextFormField(
+                  controller: controllerTitle,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Title',
+                    hintText: 'Enter post title',
+                  ),
+                  validator: validator,
+                ),
+                const SizedBox(height: 15.0),
+                TextFormField(
+                  controller: controllerBody,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Body',
+                    hintText: 'Enter post body',
+                  ),
+                  validator: validator,
+                ),
+                const SizedBox(height: 25.0),
+                SizedBox(
+                  height: 40,
+                  width: 150,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (formkey.currentState!.validate()) {
+                        _onSubmit();
+                      }
+                    },
+                    style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all<Color>(
+                        Theme.of(context).primaryColor,
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          side: BorderSide(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20.0,
+                            height: 20.0,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Добавить',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String? validator(value) {
+    if (value == null || value.isEmpty) {
+      return 'Field is required';
+    }
+    return null;
+  }
+
+  Future<void> _onSubmit() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var body = {
+      'userId': int.tryParse(controllerUserId.text),
+      'title': controllerTitle.text,
+      'body': controllerBody.text,
+    };
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode(body),
+    );
+
+    if (response.statusCode.toString().startsWith('2')) {
+      // print(response.body);
+    } else {
+      throw Exception('Failed to load data');
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }

@@ -101,192 +101,26 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
               ),
               const SizedBox(height: 15.0),
               FutureBuilder<List<Comment>>(
-                  future: comments,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && !snapshot.hasError) {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(height: 15.0);
-                        },
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          var comment = snapshot.data![index];
+                future: comments,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && !snapshot.hasError) {
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 15.0);
+                      },
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        var comment = snapshot.data![index];
 
-                          return Card(
-                            margin: EdgeInsets.zero,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8.0),
-                              ),
-                            ),
-                            color: Colors.white,
-                            elevation: 4.0,
-                            child: Container(
-                              constraints: const BoxConstraints(
-                                maxHeight: double.infinity,
-                              ),
-                              margin: const EdgeInsets.only(
-                                right: 16,
-                                left: 16,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 15.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 4),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                              right: 8.0,
-                                            ),
-                                            width: 35,
-                                            height: 35,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                100,
-                                              ),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/elon-musk.jpg',
-                                                ),
-                                                fit: BoxFit.fill,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            comment.email,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10.0),
-                                    Text(
-                                      comment.body,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                    const SizedBox(height: 10.0),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        InkWell(
-                                          child: const Text(
-                                            '6 replies',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                          onTap: () {},
-                                        ),
-                                        Text.rich(
-                                          TextSpan(
-                                            style: const TextStyle(
-                                                color: Colors.black),
-                                            children: [
-                                              WidgetSpan(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 2.0),
-                                                  child: const Icon(
-                                                    Icons.thumb_down,
-                                                    size: 15.0,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              ),
-                                              const TextSpan(
-                                                  text: "3",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.red)),
-                                            ],
-                                          ),
-                                        ),
-                                        Text.rich(
-                                          TextSpan(
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .button,
-                                            children: [
-                                              WidgetSpan(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 2.0),
-                                                  child: const Icon(
-                                                    Icons.thumb_up,
-                                                    size: 15.0,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),
-                                              ),
-                                              const TextSpan(
-                                                  text: "3",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.red,
-                                                  )),
-                                            ],
-                                          ),
-                                        ),
-                                        Text.rich(
-                                          TextSpan(
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .button,
-                                            children: [
-                                              WidgetSpan(
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 2.0),
-                                                  child: const Icon(
-                                                    Icons.reply,
-                                                    size: 15.0,
-                                                    color: Colors.blue,
-                                                  ),
-                                                ),
-                                              ),
-                                              const TextSpan(
-                                                  text: "Reply",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.blue)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 15.0),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                    return const SizedBox.shrink(child: null);
-                  }),
+                        return _CommentWidget(comment: comment);
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink(child: null);
+                },
+              ),
             ],
           ),
         ),
@@ -315,5 +149,164 @@ class _PostDetailsPageState extends State<PostDetailsPage> {
     } else {
       throw Exception('Failed to load data');
     }
+  }
+}
+
+class _CommentWidget extends StatelessWidget {
+  final Comment comment;
+
+  const _CommentWidget({Key? key, required this.comment}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(8.0),
+        ),
+      ),
+      color: Colors.white,
+      elevation: 4.0,
+      child: Container(
+        constraints: const BoxConstraints(
+          maxHeight: double.infinity,
+        ),
+        margin: const EdgeInsets.only(
+          right: 16,
+          left: 16,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(
+                        right: 8.0,
+                      ),
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          100,
+                        ),
+                        image: const DecorationImage(
+                          image: AssetImage(
+                            'assets/elon-musk.jpg',
+                          ),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      comment.email,
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              Text(
+                comment.body,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    child: const Text(
+                      '6 replies',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    onTap: () {},
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      style: const TextStyle(color: Colors.black),
+                      children: [
+                        WidgetSpan(
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 2.0),
+                            child: const Icon(
+                              Icons.thumb_down,
+                              size: 15.0,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                        const TextSpan(
+                            text: "3",
+                            style: TextStyle(fontSize: 14, color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      style: Theme.of(context).textTheme.button,
+                      children: [
+                        WidgetSpan(
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 2.0),
+                            child: const Icon(
+                              Icons.thumb_up,
+                              size: 15.0,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                        const TextSpan(
+                            text: "3",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.red,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      style: Theme.of(context).textTheme.button,
+                      children: [
+                        WidgetSpan(
+                          child: Container(
+                            padding: const EdgeInsets.only(right: 2.0),
+                            child: const Icon(
+                              Icons.reply,
+                              size: 15.0,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        const TextSpan(
+                            text: "Reply",
+                            style: TextStyle(fontSize: 14, color: Colors.blue)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15.0),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
